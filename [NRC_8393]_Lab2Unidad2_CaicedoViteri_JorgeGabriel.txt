@@ -1,0 +1,194 @@
+Create TABLE Persona
+(
+PK_ID_persona INTEGER NOT NULL PRIMARY KEY,
+NM_nombre_persona VARCHAR NOT NULL,
+NM_apellido_persona VARCHAR NOT NULL,
+DT_fecha_nacimiento_persona DATE NOT NULL,
+AGE_edad_persona INTEGER
+);
+
+Create TABLE Estudiante
+(
+PK_FK_ID_persona INTEGER NOT NULL PRIMARY KEY,
+LNK_foto_estudiante VARCHAR NOT NULL,
+CONSTRAINT FK_persona
+FOREIGN KEY (PK_FK_ID_persona) 
+REFERENCES Persona(PK_ID_persona)
+);
+
+Create TABLE Docente
+(
+PK_FK_ID_persona INTEGER NOT NULL PRIMARY KEY,
+TITL_titulo_docente VARCHAR NOT NULL,
+CONSTRAINT FK_persona
+FOREIGN KEY (PK_FK_ID_persona) 
+REFERENCES Persona(PK_ID_persona)
+);
+
+Create TABLE Representar
+(
+PK_FK_ID_persona_estudiante INTEGER NOT NULL,
+PK_FK_ID_persona_representante INTEGER NOT NULL,
+TXT_parentesco VARCHAR NOT NULL,
+CONSTRAINT FK_persona
+FOREIGN KEY (PK_FK_ID_persona_estudiante,PK_FK_ID_persona_representante) 
+REFERENCES Persona(PK_ID_persona,PK_ID_persona),
+PRIMARY KEY (PK_FK_ID_persona_estudiante,PK_FK_ID_persona_representante)
+);
+
+Create TABLE Usuario
+(
+PK_ID_usuario VARCHAR NOT NULL PRIMARY KEY,
+NM_nombre_usuario VARCHAR NOT NULL,
+KEY_password_usuario VARCHAR NOT NULL,
+FK_ID_persona VARCHAR NOT NULL,
+CONSTRAINT FK_persona
+FOREIGN KEY (FK_ID_persona) 
+REFERENCES Persona(PK_ID_persona)
+);
+
+Create TABLE Rol
+(
+PK_ID_rol VARCHAR NOT NULL PRIMARY KEY,
+DESC_descripcion_rol VARCHAR NOT NULL
+);
+
+Create TABLE Definir
+(
+PK_FK_ID_usuario VARCHAR NOT NULL,
+PK_FK_ID_rol VARCHAR NOT NULL,
+CONSTRAINT FK_usuario
+FOREIGN KEY (PK_FK_ID_usuario) 
+REFERENCES Usuario(PK_ID_usuario),
+CONSTRAINT FK_rol
+FOREIGN KEY (PK_FK_ID_rol) 
+REFERENCES Rol(PK_ID_rol),
+PRIMARY KEY (PK_FK_ID_usuario,PK_FK_ID_rol)
+);
+
+
+Create TABLE Año_Escolar
+(
+PK_ID_año VARCHAR NOT NULL PRIMARY KEY,
+NM_nombre_año VARCHAR NOT NULL,
+STS_estado_año VARCHAR NOT NULL
+);
+
+Create TABLE Nivel
+(
+PK_ID_nivel VARCHAR NOT NULL PRIMARY KEY,
+NM_nombre_nivel VARCHAR NOT NULL
+);
+
+Create TABLE Matricular
+(
+PK_FK_ID_persona INTEGER NOT NULL,
+PK_FK_ID_año VARCHAR NOT NULL,
+FK_ID_nivel VARCHAR NOT NULL,
+STS_estado VARCHAR NOT NULL,
+CONSTRAINT FK_estudiante
+FOREIGN KEY (PK_FK_ID_persona) 
+REFERENCES Estudiante(PK_FK_ID_persona),
+CONSTRAINT FK_año
+FOREIGN KEY (PK_FK_ID_año) 
+REFERENCES Año_Escolar(PK_ID_año),
+CONSTRAINT FK_nivel
+FOREIGN KEY (FK_ID_nivel) 
+REFERENCES Nivel(PK_ID_nivel),
+PRIMARY KEY (PK_FK_ID_persona,PK_FK_ID_año)
+);
+
+Create TABLE Materia
+(
+PK_ID_materia VARCHAR NOT NULL PRIMARY KEY,
+NM_nombre_materia VARCHAR NOT NULL,
+DESC_descripcion_materia VARCHAR NOT NULL,
+FK_ID_nivel VARCHAR NOT NULL,
+CONSTRAINT FK_nivel
+FOREIGN KEY (FK_ID_nivel) 
+REFERENCES Nivel(PK_ID_nivel)
+);
+
+Create TABLE Actividad
+(
+PK_ID_actividad VARCHAR NOT NULL,
+TXT_tema_actividad VARCHAR NOT NULL,
+STS_estado_actividad VARCHAR NOT NULL,
+PK_FK_ID_materia VARCHAR NOT NULL,
+CONSTRAINT FK_materia
+FOREIGN KEY (PK_FK_ID_materia) 
+REFERENCES Materia(PK_ID_materia),
+PRIMARY KEY (PK_ID_actividad,PK_FK_ID_materia)
+);
+
+Create TABLE Libreta
+(
+PK_ID_libreta VARCHAR NOT NULL PRIMARY KEY,
+NM_nombre_libreta VARCHAR NOT NULL,
+STS_estado_libreta VARCHAR NOT NULL
+);
+
+Create TABLE Registrar
+(
+PK_FK_ID_materia VARCHAR NOT NULL,
+PK_FK_ID_actividad VARCHAR NOT NULL,
+PK_FK_ID_libreta VARCHAR NOT NULL,
+NUM_nota INTEGER NOT NULL,
+CONSTRAINT FK_actividad
+FOREIGN KEY (PK_FK_ID_materia,PK_FK_ID_actividad) 
+REFERENCES Actividad(PK_FK_ID_materia,PK_ID_actividad),
+CONSTRAINT FK_libreta
+FOREIGN KEY (PK_FK_ID_libreta) 
+REFERENCES Libreta(PK_ID_libreta),
+PRIMARY KEY (PK_FK_ID_materia,PK_FK_ID_actividad,PK_FK_ID_libreta)
+);
+
+Create TABLE Base_Legal
+(
+PK_ID_base VARCHAR NOT NULL PRIMARY KEY,
+NM_nombre_base VARCHAR NOT NULL,
+STS_estado_base VARCHAR NOT NULL
+);
+
+
+Create TABLE Institucion
+(
+PK_ID_institucion VARCHAR PRIMARY KEY,
+NM_nombre_institucion VARCHAR NOT NULL,
+TXT_modalidad_institucion VARCHAR NOT NULL,
+TXT_jornada_institucion VARCHAR NOT NULL,
+FK_ID_base VARCHAR NOT NULL,
+CONSTRAINT FK_base
+FOREIGN KEY (FK_ID_base)
+REFERENCES Base_Legal(PK_ID_base)
+);
+
+Create TABLE Aula
+(
+PK_ID_aula VARCHAR NOT NULL,
+NM_nombre_aula VARCHAR NOT NULL,
+PK_FK_ID_institucion VARCHAR NOT NULL,
+CONSTRAINT FK_institucion
+FOREIGN KEY (PK_FK_ID_institucion)
+REFERENCES Institucion(PK_ID_institucion),
+PRIMARY KEY (PK_ID_aula,PK_FK_ID_institucion)
+);
+
+Create TABLE Ubicar
+(
+PK_FK_ID_persona VARCHAR NOT NULL,
+PK_FK_ID_institucion VARCHAR NOT NULL,
+PK_FK_ID_aula VARCHAR NOT NULL,
+PK_FK_ID_materia VARCHAR NOT NULL,
+DESC_horario VARCHAR NOT NULL,
+CONSTRAINT FK_aula
+FOREIGN KEY (PK_FK_ID_institucion,PK_FK_ID_aula)
+REFERENCES Aula(PK_FK_ID_institucion,PK_ID_aula),
+CONSTRAINT FK_persona
+FOREIGN KEY (PK_FK_ID_persona)
+REFERENCES Docente(PK_FK_ID_persona),
+CONSTRAINT FK_materia
+FOREIGN KEY (PK_FK_ID_materia)
+REFERENCES Materia(PK_ID_materia),
+PRIMARY KEY (PK_FK_ID_institucion,PK_FK_ID_aula,PK_FK_ID_materia,PK_FK_ID_persona)
+);
